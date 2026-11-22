@@ -10,7 +10,7 @@ Un agent qui répare l'accessibilité. Il ouvre une page, trouve ce qui gêne, �
 ![RGAA](https://img.shields.io/badge/RGAA-4.1-1f6feb)
 ![Licence](https://img.shields.io/badge/licence-MIT-lightgrey)
 
-[Démarrer](#ce-que-ça-donne-tout-de-suite) · [Comment il travaille](#comment-il-travaille) · [Ce qu'il ne sait pas faire](#ce-quil-ne-sait-pas-faire) · [Déploiement](docs/DEPLOY.md)
+[▶ Vidéo de présentation](https://youtu.be/VIDEO_ID) · [Démarrer](#ce-que-ça-donne-tout-de-suite) · [Comment il travaille](#comment-il-travaille) · [Ce qu'il ne sait pas faire](#ce-quil-ne-sait-pas-faire) · [Déploiement](docs/DEPLOY.md)
 
 ## Ce que j'ai voulu faire
 
