@@ -4,6 +4,8 @@
 
 Un agent qui répare l'accessibilité. Il ouvre une page, trouve ce qui gêne, écrit la correction, revérifie, et recommence. À la fin il montre deux états du même site, avec les chiffres qui vont avec.
 
+![La démo, le même site avant et après corrections](docs/demo.gif)
+
 [![CI](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-3776AB)
 ![Dépendances](https://img.shields.io/badge/d%C3%A9pendances-aucune-2ea44f)

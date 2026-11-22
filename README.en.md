@@ -4,6 +4,8 @@
 
 An agent that repairs accessibility. It opens a page, finds what gets in the way, writes the fix, checks again, and repeats. At the end it shows two states of the same site, with the numbers that go with them.
 
+![The demo, the same site before and after](docs/demo.gif)
+
 [![CI](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-3776AB)
 ![Dependencies](https://img.shields.io/badge/dependencies-none-2ea44f)

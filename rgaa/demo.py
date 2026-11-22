@@ -70,6 +70,7 @@ DEMO_PAGE = """<!doctype html>
   .row input, .row select { font: inherit; font-size: 13px; padding: 7px 10px; border: 1px solid #f0dfe7; border-radius: 9px; min-width: 260px; background: #fffaf7; }
   .run button { font: inherit; font-size: 13px; padding: 8px 16px; border-radius: 9px; border: 1px solid #b03060; background: #b03060; color: #fff; font-weight: 600; cursor: pointer; }
   .run button:disabled { opacity: .6; cursor: progress; }
+  .run button.probe { background: #fff; color: #b03060; border-color: #b03060; }
   .out { font-size: 13px; color: #6d5f6b; }
   .pages { display: flex; gap: 8px; justify-content: center; margin: 18px 0 6px; flex-wrap: wrap; }
   .pages a { font-size: 13px; text-decoration: none; color: #6d5f6b; border: 1px solid #f0dfe7; background: #fff; border-radius: 999px; padding: 5px 14px; }
@@ -122,7 +123,9 @@ DEMO_PAGE = """<!doctype html>
   </div>
   <div class="row" id="runModelRow" hidden>
     <label for="runModel">Modèle vision</label>
-    <input id="runModel" value="moondream" spellcheck="false">
+    <select id="runModel"><option value="">sonder le serveur…</option></select>
+    <button id="runProbe" type="button" class="probe">Lister les modèles</button>
+    <span id="runProbeOut" class="out"></span>
   </div>
   <section class="changes">
     <h2>Ce qui change sur cette page</h2>
@@ -169,6 +172,30 @@ DEMO_PAGE = """<!doctype html>
   document.getElementById("runProbe").addEventListener("click", probeModels);
   const mode2 = document.getElementById("runMode");
   mode2.addEventListener("change", () => { if (mode2.value !== "none") probeModels(); });
+
+  const runModel = document.getElementById("runModel");
+  const runProbeOut = document.getElementById("runProbeOut");
+  async function probeModels() {
+    const url = document.getElementById("runMode").value === "local"
+      ? "http://127.0.0.1:11434"
+      : document.getElementById("runUrl").value.trim();
+    if (!url) { runProbeOut.textContent = "adresse vide"; return; }
+    runProbeOut.textContent = "…";
+    try {
+      const response = await fetch("__PREFIX__/api/models?url=" + encodeURIComponent(url));
+      const data = await response.json();
+      if (data.error) { runProbeOut.textContent = data.error; return; }
+      const list = data.models || [];
+      runModel.innerHTML = list.length
+        ? list.map((m) => `<option value="${m}">${m}</option>`).join("")
+        : '<option value="">aucun modèle exposé</option>';
+      runProbeOut.textContent = list.length + " modèle(s)";
+    } catch (error) { runProbeOut.textContent = "échec : " + error; }
+  }
+  document.getElementById("runProbe").addEventListener("click", probeModels);
+  document.getElementById("runMode").addEventListener("change", () => {
+    if (document.getElementById("runMode").value !== "none") probeModels();
+  });
 
   const mode = document.getElementById("runMode");
   const urlRow = document.getElementById("runUrlRow");
