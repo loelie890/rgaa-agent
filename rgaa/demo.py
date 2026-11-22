@@ -104,13 +104,13 @@ DEMO_PAGE = """<!doctype html>
     <label for="runMode">Moteur</label>
     <select id="runMode">
       <option value="none">Sans modèle, corrections déterministes (0,4 s)</option>
-      <option value="remote">Ollama distant, URL à saisir</option>
-      <option value="local">Ollama local du conteneur (127.0.0.1:11434)</option>
+      <option value="remote">Endpoint distant : Ollama, LM Studio, vLLM</option>
+      <option value="local">Ollama du conteneur, si l'image le contient</option>
     </select>
   </div>
   <div class="row" id="runUrlRow" hidden>
     <label for="runUrl">Serveur Ollama</label>
-    <input id="runUrl" value="http://192.168.1.13:11434" spellcheck="false">
+    <input id="runUrl" value="http://192.168.1.10:11434" spellcheck="false">
   </div>
   <div class="row" id="runModelRow" hidden>
     <label for="runModel">Modèle vision</label>
