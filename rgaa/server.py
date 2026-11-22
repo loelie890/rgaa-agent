@@ -280,7 +280,11 @@ class Handler(BaseHTTPRequestHandler):
             mode = str(payload.get("mode") or "none")
             vision = {}
             if mode != "none":
-                vision = {"base_url": payload.get("vision_url") or None, "model": payload.get("vision_model") or None}
+                default_url = "http://127.0.0.1:11434" if mode == "local" else None
+                vision = {
+                    "base_url": payload.get("vision_url") or default_url,
+                    "model": payload.get("vision_model") or None,
+                }
                 if not (vision["base_url"] and vision["model"]):
                     self._send_json({"error": "URL et modèle requis pour ce mode"}, 400)
                     return
@@ -579,7 +583,11 @@ class Handler(BaseHTTPRequestHandler):
             mode = str(payload.get("mode") or "none")
             vision = {}
             if mode != "none":
-                vision = {"base_url": payload.get("vision_url") or None, "model": payload.get("vision_model") or None}
+                default_url = "http://127.0.0.1:11434" if mode == "local" else None
+                vision = {
+                    "base_url": payload.get("vision_url") or default_url,
+                    "model": payload.get("vision_model") or None,
+                }
                 if not (vision["base_url"] and vision["model"]):
                     self._send_json({"error": "URL et modèle requis pour ce mode"}, 400)
                     return
