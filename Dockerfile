@@ -27,7 +27,8 @@ RUN groupadd --gid 568 app \
  && chown -R 568:568 /app /var/lib/rgaa
 
 # Ollama optionnel : binaire officiel, sans service systemd et sans GPU obligatoire.
-RUN if [ "$INSTALL_OLLAMA" = "1" ]; then \
+RUN echo "install_ollama=${INSTALL_OLLAMA}" \
+    && if [ "$INSTALL_OLLAMA" = "1" ]; then \
       apt-get update && apt-get install -y --no-install-recommends curl ca-certificates zstd \
       && ARCH="$(dpkg --print-architecture)" \
       && curl -fsSL "https://github.com/ollama/ollama/releases/latest/download/ollama-linux-${ARCH}.tar.zst" -o /tmp/ollama.tar.zst \
@@ -39,7 +40,8 @@ RUN if [ "$INSTALL_OLLAMA" = "1" ]; then \
 # Navigateur optionnel : Chromium et Xvfb, pour le passage rendu.
 # Headless fonctionne sans écran, headful passe par xvfb-run dans le conteneur.
 ARG INSTALL_BROWSER=0
-RUN if [ "$INSTALL_BROWSER" = "1" ]; then \
+RUN echo "install_browser=${INSTALL_BROWSER}" \
+    && if [ "$INSTALL_BROWSER" = "1" ]; then \
       apt-get update && apt-get install -y --no-install-recommends \
         chromium xvfb xauth fonts-liberation fonts-dejavu-core ca-certificates \
       && rm -rf /var/lib/apt/lists/* ; \
