@@ -221,7 +221,7 @@ class Handler(BaseHTTPRequestHandler):
     # -- routes ----------------------------------------------------------- #
     def _demo(self, path: str) -> None:
         """Le mode démo, monté sur le port de l'application : un seul port à ouvrir."""
-        from .demo import DEMO_PAGE, _guess_type, annotations
+        from .demo import DEMO_PAGE, _guess_type, annotations, list_models_any
 
         info = _demo_cached()
         relative = path[len("/demo") :].lstrip("/")
@@ -239,6 +239,13 @@ class Handler(BaseHTTPRequestHandler):
                 .replace("__PATCHES__", str(info["patches"]))
             )
             self._send(200, markup.encode("utf-8"), "text/html; charset=utf-8")
+            return
+        if relative == "api/models":
+            url = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("url") or [""])[0]
+            try:
+                self._send_json(list_models_any(url))
+            except Exception as exc:  # noqa: BLE001
+                self._send_json({"error": f"{type(exc).__name__}: {exc}"}, 502)
             return
         if relative == "api/patches":
             self._send_json({"patches": info.get("details", [])})

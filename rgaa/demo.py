@@ -147,6 +147,29 @@ DEMO_PAGE = """<!doctype html>
     list.innerHTML = items.map((p) => `<li>${p.review ? "à relire · " : ""}<code>${p.selector || ""}</code> ${p.op || ""}</li>`).join("");
   }).catch(() => {});
 
+  const runModel = document.getElementById("runModel");
+  const runProbeOut = document.getElementById("runProbeOut");
+  async function probeModels() {
+    const url = mode.value === "local"
+      ? "http://127.0.0.1:11434"
+      : document.getElementById("runUrl").value.trim();
+    if (!url) { runProbeOut.textContent = "adresse vide"; return; }
+    runProbeOut.textContent = "…";
+    try {
+      const response = await fetch("__PREFIX__/api/models?url=" + encodeURIComponent(url));
+      const data = await response.json();
+      if (data.error) { runProbeOut.textContent = data.error; return; }
+      const list = data.models || [];
+      runModel.innerHTML = list.length
+        ? list.map((m) => `<option value="${m}">${m}</option>`).join("")
+        : '<option value="">aucun modèle exposé</option>';
+      runProbeOut.textContent = list.length + " modèle(s)";
+    } catch (error) { runProbeOut.textContent = "échec : " + error; }
+  }
+  document.getElementById("runProbe").addEventListener("click", probeModels);
+  const mode2 = document.getElementById("runMode");
+  mode2.addEventListener("change", () => { if (mode2.value !== "none") probeModels(); });
+
   const mode = document.getElementById("runMode");
   const urlRow = document.getElementById("runUrlRow");
   const modelRow = document.getElementById("runModelRow");
@@ -265,6 +288,21 @@ def run_now(vision: dict[str, Any] | None = None) -> dict[str, Any]:
     }
 
 
+def list_models_any(base_url: str) -> dict[str, Any]:
+    """Liste les modèles d'un endpoint : API OpenAI compatible, puis API native d'Ollama."""
+    from .planners import list_models
+
+    try:
+        return list_models(base_url)
+    except Exception:
+        root = str(base_url).rstrip("/")
+        if root.endswith("/v1"):
+            root = root[:-3]
+        with urllib.request.urlopen(root + "/api/tags", timeout=10) as response:  # noqa: S310
+            payload = json.loads(response.read().decode("utf-8"))
+        return {"base_url": root, "models": [m.get("name") for m in payload.get("models", []) if m.get("name")]}
+
+
 def annotations(patches: list[dict[str, Any]], page: str) -> str:
     """Encadre dans la page corrigée les éléments que l'agent a modifiés."""
     skip = {"html", "body", "head", "title", "meta", "link", "script", "style"}
@@ -367,6 +405,12 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, markup.encode("utf-8"), "text/html; charset=utf-8")
         elif path == "/healthz":
             self._send(200, b'{"ok": true}', "application/json; charset=utf-8")
+        elif path == "/api/models":
+            url = (urllib.parse.parse_qs(parsed.query).get("url") or [""])[0]
+            try:
+                self._send(200, json.dumps(list_models_any(url)).encode(), "application/json; charset=utf-8")
+            except Exception as exc:  # noqa: BLE001
+                self._send(502, json.dumps({"error": f"{type(exc).__name__}: {exc}"}).encode(), "application/json; charset=utf-8")
         elif path == "/api/patches":
             payload = {"patches": info.get("details", [])}
             self._send(200, json.dumps(payload, ensure_ascii=False).encode("utf-8"), "application/json; charset=utf-8")
