@@ -36,7 +36,9 @@ On a four-page demo site: **70.8 % before, 100 % after**, 48 checks out of 48, 1
 docker run --rm -p 8080:8080 -p 8090:8090 -v rgaa-data:/var/lib/rgaa ghcr.io/loelie890/rgaa-agent:latest
 ```
 
-The interface is on `http://localhost:8080`, the demo on `/demo` and on `http://localhost:8090`. The image is about 330 MB, Chromium and Xvfb are already inside, so the rendered pass works without installing anything. A second image, `:ollama`, adds the engine for the offline demo and is about 2.2 GB.
+The interface is on `http://localhost:8080`, the demo on `/demo` and on `http://localhost:8090`.
+
+Three images, pick the one you need. `:latest` is about 45 MB and does the static audit, the demo, the API and MCP. `:browser` adds Chromium and Xvfb, about 330 MB, for the rendered pass. `:ollama` adds the engine, about 2.2 GB, only if you want a model inside the container.
 
 ## The demo, in practice
 

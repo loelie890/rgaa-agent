@@ -36,7 +36,17 @@ Sur un site de démonstration de quatre pages : **70,8 % avant, 100 % après**, 
 docker run --rm -p 8080:8080 -p 8090:8090 -v rgaa-data:/var/lib/rgaa ghcr.io/loelie890/rgaa-agent:latest
 ```
 
-L'interface arrive sur `http://localhost:8080`, la démo sur `/demo` et sur `http://localhost:8090`. L'image fait environ 330 Mo, Chromium et Xvfb y sont déjà, donc le rendu réel fonctionne sans rien installer. Une seconde image, `:ollama`, ajoute le moteur et un modèle possible pour la démo hors ligne, elle fait environ 2,2 Go.
+L'interface arrive sur `http://localhost:8080`, la démo sur `/demo` et sur `http://localhost:8090`.
+
+Trois images, selon ce que vous voulez faire, et vous ne tirez que celle dont vous avez besoin.
+
+| Image | Contenu | Taille | Pour quoi |
+| --- | --- | --- | --- |
+| `:latest` | audit statique, démo, API, MCP | environ 45 Mo | l'essentiel, en quelques secondes |
+| `:browser` | plus Chromium et Xvfb | environ 330 Mo | le passage rendu réel |
+| `:ollama` | plus Ollama | environ 2,2 Go | la démo avec un modèle dedans |
+
+Aucun modèle n'est imposé : `:latest` suffit pour corriger un site, `:browser` ajoute la mesure dans un vrai navigateur, et `:ollama` ne sert qu'à faire tourner un modèle dans le conteneur.
 
 ## La démo, en pratique
 
