@@ -99,7 +99,7 @@ def analyse_image(
     base_url: str | None,
     model: str | None,
     api_key: str | None = None,
-    timeout: int = 90,
+    timeout: int = 240,
 ) -> dict[str, Any]:
     """Décrit l'image et dit si elle contient du texte : la brique d'un audit complet."""
     data, mime = _target_bytes(target)
@@ -208,6 +208,7 @@ def _ollama_call(base: str, model: str, prompt: str, payload: "bytes | Path", ti
         "prompt": prompt,
         "stream": False,
         "images": [base64.b64encode(data).decode("ascii")],
+        "options": {"num_predict": 80, "temperature": 0},
     }
     root = base[:-3] if base.endswith("/v1") else base
     response = _post_json(root.rstrip("/") + "/api/generate", body, None, timeout)
@@ -261,7 +262,7 @@ def describe_image(
     model: str | None,
     prompt: str = "",
     api_key: str | None = None,
-    timeout: int = 90,
+    timeout: int = 240,
 ) -> dict[str, Any]:
     path = Path(path)
     if not path.is_file():

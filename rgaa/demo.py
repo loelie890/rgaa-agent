@@ -114,7 +114,7 @@ DEMO_PAGE = """<!doctype html>
   </div>
   <div class="row" id="runModelRow" hidden>
     <label for="runModel">Modèle vision</label>
-    <input id="runModel" placeholder="qwen2.5vl:3b" spellcheck="false">
+    <input id="runModel" value="moondream" spellcheck="false">
   </div>
   <div class="row">
     <button id="runBtn" type="button">Lancer maintenant</button>

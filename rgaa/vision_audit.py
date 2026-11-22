@@ -137,7 +137,7 @@ def audit_documents(
     site_root: Path,
     vision: dict[str, Any] | None,
     base_url: str | None = None,
-    limit: int = 20,
+    limit: int = 4,
 ) -> dict[str, Any]:
     """Analyse les images des pages fournies. Retourne constats, images vues, état du modèle."""
     config = vision or {}
@@ -187,7 +187,7 @@ def audit_documents(
                 config.get("base_url"),
                 config.get("model"),
                 api_key=config.get("api_key"),
-                timeout=int(config.get("timeout", 60)),
+                timeout=int(config.get("timeout", 240)),
             )
             analysis["src"] = src
             verdict = classify(alt, analysis)
@@ -201,6 +201,7 @@ def audit_documents(
                 "brut": analysis.get("brut", ""),
                 "usable": analysis.get("usable"),
                 "reason": analysis.get("reason") or analysis.get("source", ""),
+                "ms": analysis.get("ms"),
                 "contains_text": analysis.get("contains_text"),
                 "kind": analysis.get("kind", ""),
                 "available": analysis.get("available", False),
@@ -224,6 +225,7 @@ def audit_documents(
                 "brut": analysis.get("brut", ""),
                 "usable": analysis.get("usable"),
                 "reason": analysis.get("reason") or analysis.get("source", ""),
+                "ms": analysis.get("ms"),
                     }
                 )
     return report
