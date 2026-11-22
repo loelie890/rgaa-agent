@@ -30,6 +30,14 @@ python -m rgaa coverage           # les 106 critères du RGAA, un par un
 
 Sur un site de démonstration de quatre pages : **70,8 % avant, 100 % après**, 48 contrôles sur 48, 16 corrections réellement écrites dans les fichiers, zéro erreur, en 0,45 seconde. Sans GPU, sans modèle, sans réseau, sans compte.
 
+## Lancer dans Docker
+
+```bash
+docker run --rm -p 8080:8080 -p 8090:8090 -v rgaa-data:/var/lib/rgaa ghcr.io/loelie890/rgaa-agent:latest
+```
+
+L'interface arrive sur `http://localhost:8080`, la démo sur `/demo` et sur `http://localhost:8090`. L'image fait environ 330 Mo, Chromium et Xvfb y sont déjà, donc le rendu réel fonctionne sans rien installer. Une seconde image, `:ollama`, ajoute le moteur et un modèle possible pour la démo hors ligne, elle fait environ 2,2 Go.
+
 ## Comment il travaille
 
 ```mermaid

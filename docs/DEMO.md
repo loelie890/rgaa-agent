@@ -7,7 +7,7 @@ Le chemin le plus court vers un résultat vérifiable.
 ```bash
 python -m rgaa serve --open
 # ou
-docker run --rm -p 8080:8080 -v rgaa-data:/var/lib/rgaa ghcr.io/<compte>/rgaa-agent:latest
+docker run --rm -p 8080:8080 -v rgaa-data:/var/lib/rgaa ghcr.io/loelie890/rgaa-agent:latest
 ```
 
 Ouvrir <http://127.0.0.1:8080>.

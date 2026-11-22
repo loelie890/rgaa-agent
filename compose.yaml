@@ -12,7 +12,7 @@ services:
     ports:
       - "8080:8080"
       - "8090:8090"
-    user: "568:568"            # même UID que l'utilisateur applicatif TrueNAS
+    user: "568:568"            # UID non-root, lisible depuis l'hôte
     environment:
       RGAA_RUNS: /var/lib/rgaa/runs
       RGAA_DATA: /var/lib/rgaa

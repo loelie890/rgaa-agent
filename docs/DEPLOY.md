@@ -4,10 +4,9 @@ L'image légère fait 43 Mo et sait tout faire sauf deux choses : ouvrir une pag
 dans un navigateur, et faire tourner un modèle. Ces deux-là sont des **arguments
 de construction**, pas des variables d'environnement.
 
-C'est la confusion la plus fréquente sur TrueNAS : le panneau « Variables
-d'environnement » d'une application ne reconstruit rien, il ne fait que passer
-des valeurs au conteneur déjà construit. Mettre `INSTALL_BROWSER=1` à cet endroit
-n'installe pas Chromium.
+C'est la confusion la plus fréquente : une variable d'environnement ne reconstruit
+rien, elle ne fait que passer une valeur au conteneur déjà construit. Mettre
+`INSTALL_BROWSER=1` dans un fichier d'environnement n'installe pas Chromium.
 
 ## Construire les trois variantes
 
@@ -25,11 +24,18 @@ docker build --build-arg INSTALL_OLLAMA=1 -t rgaa-agent:full .
 docker build --build-arg INSTALL_BROWSER=1 --build-arg INSTALL_OLLAMA=1 -t rgaa-agent:complet .
 ```
 
-Puis taguer et pousser vers le registre que TrueNAS utilise :
+Rien à pousser : les images sont déjà publiées à chaque commit.
+
+| Image | Contenu | Taille | Usage |
+| --- | --- | --- | --- |
+| `ghcr.io/loelie890/rgaa-agent:latest` | Chromium, Xvfb | environ 330 Mo | audit complet, rendu réel |
+| `ghcr.io/loelie890/rgaa-agent:ollama` | Chromium, Xvfb, Ollama | environ 2,2 Go | démo hors ligne avec modèle |
+
+Si vous construisez la vôtre, taguez avec votre compte :
 
 ```bash
-docker tag rgaa-agent:complet ghcr.io/<compte>/rgaa-agent:1.0.0
-docker push ghcr.io/<compte>/rgaa-agent:1.0.0
+docker build --build-arg INSTALL_BROWSER=1 -t ghcr.io/loelie890/rgaa-agent:1.0.0 .
+docker push ghcr.io/loelie890/rgaa-agent:1.0.0
 ```
 
 ## Variable d'environnement : seulement pour allumer
@@ -47,8 +53,8 @@ l'Ollama embarqué, `http://host.docker.internal:11434` pour celui de l'hôte.
 ## La démo est sur le même port
 
 `python -m rgaa demo` ouvre un second serveur sur 8090, ce qui demande un port de
-plus à publier. Dans une application TrueNAS, ce port est rarement exposé, et la
-démo paraît alors cassée. La même démo est donc servie par l'application
+plus à publier. Sur un poste ou dans un orchestrateur, ce second port est rarement
+exposé, et la démo paraît alors cassée. La même démo est donc servie par l'application
 elle-même, sans port supplémentaire :
 
 | Adresse | Contenu |
