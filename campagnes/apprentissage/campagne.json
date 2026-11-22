@@ -1,0 +1,12 @@
+{
+  "slug": "apprentissage",
+  "title": "Apprentissage d'une procédure",
+  "objective": "Corrige l'image de la page pour que l'audit passe, et produis le rapport.",
+  "as_of": "2026-11-20",
+  "budget": 10,
+  "fixtures": "gamme",
+  "passes": [
+    { "label": "passe 1 — sans procédure", "cassette": "cassette-1.json" },
+    { "label": "passe 2 — avec la procédure apprise", "cassette": "cassette-2.json" }
+  ]
+}

@@ -1,0 +1,11 @@
+# exécution
+runs/
+data/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# divers
+.DS_Store
+*.log

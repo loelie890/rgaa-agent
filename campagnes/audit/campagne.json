@@ -1,0 +1,9 @@
+{
+  "slug": "audit",
+  "title": "Audit du site",
+  "objective": "Audite le site et explique les violations les plus graves, sans rien corriger.",
+  "as_of": "2026-11-20",
+  "budget": 6,
+  "fixtures": "site",
+  "passes": [{ "label": "passe unique", "cassette": "cassette.json" }]
+}

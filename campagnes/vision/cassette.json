@@ -1,0 +1,10 @@
+{
+  "steps": [
+    { "thought": "Je pars de l'audit pour savoir quelle image est en défaut.", "tool": "audit_run", "args": { "page": "index.html" } },
+    { "thought": "Je demande une description au modèle vision local. S'il n'y en a pas, l'outil me le dit au lieu d'inventer.", "tool": "inspect_image", "args": { "path": "hero.png", "question": "Décris cette image en une phrase courte pour un attribut alt HTML, en français." } },
+    { "thought": "La description obtenue est celle que j'applique : elle vient de l'image, pas du nom de fichier.", "tool": "patch_html", "args": { "page": "index.html", "selector": "img#hero-shot", "op": "set_attr", "name": "alt", "value": "Trottinette électrique rouge pliée devant la boutique" } },
+    { "thought": "Je vérifie que la règle 1.1 passe désormais sur cette page.", "tool": "audit_run", "args": { "page": "index.html" } },
+    { "thought": "Je garde une trace lisible de l'intervention.", "tool": "report_html", "args": { "name": "rapport-vision.html" } },
+    { "thought": "Fait, avec une description issue de l'image et un repli explicite quand aucun VLM n'est disponible.", "final": "L'image d'accueil a maintenant une description utile au lieu d'un alt absent. L'outil inspect_image a interrogé un modèle vision local (Qwen2.5-VL, LLaVA ou moondream via Ollama ou LM Studio) ; s'il n'y avait aucun modèle chargé, il a renvoyé available=false et la description a été déduite du contexte HTML (texte du lien, titre de la page, sujet de la section), sans jamais prétendre avoir vu l'image. En mode replay, la description écrite ici est celle qui a été enregistrée ; en mode live, c'est le modèle qui dicte l'alt. Le rapport est dans deliverables/rapport-vision.html." }
+  ]
+}

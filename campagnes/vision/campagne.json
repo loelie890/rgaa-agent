@@ -1,0 +1,9 @@
+{
+  "slug": "vision",
+  "title": "Description d'image, vision locale ou repli",
+  "objective": "Décris réellement l'image d'accueil avec un modèle vision local, ou déduis la description du contexte HTML si aucun VLM n'est chargé, puis corrige l'attribut alt.",
+  "as_of": "2026-11-20",
+  "budget": 8,
+  "fixtures": "site",
+  "passes": [{ "label": "passe unique", "cassette": "cassette.json" }]
+}

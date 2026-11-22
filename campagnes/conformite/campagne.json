@@ -1,0 +1,9 @@
+{
+  "slug": "conformite",
+  "title": "Mise en conformité du site",
+  "objective": "Corrige le site jusqu'à ce que les 12 règles passent sur les 4 pages, et produis le rapport avant/après en markdown et en HTML.",
+  "as_of": "2026-11-20",
+  "budget": 28,
+  "fixtures": "site",
+  "passes": [{ "label": "passe unique", "cassette": "cassette.json" }]
+}

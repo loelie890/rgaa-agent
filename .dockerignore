@@ -1,0 +1,13 @@
+.git
+.gitignore
+.github
+tests/
+docs/
+runs/
+data/
+__pycache__/
+*.py[cod]
+*.md
+!README.md
+!README.en.md
+.DS_Store

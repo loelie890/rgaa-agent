@@ -1,0 +1,45 @@
+services:
+  rgaa-agent:
+    build:
+      context: .
+      args:
+        # 0 = image légère (43 Mo), 1 = image avec Ollama embarqué
+        INSTALL_OLLAMA: "1"
+        # 1 = Chromium et Xvfb dans l'image, pour le passage rendu
+        INSTALL_BROWSER: "1"
+    image: rgaa-agent:latest   # taguer vers votre registre avant publication
+    container_name: rgaa-agent
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+    user: "568:568"            # même UID que l'utilisateur applicatif TrueNAS
+    environment:
+      RGAA_RUNS: /var/lib/rgaa/runs
+      RGAA_DATA: /var/lib/rgaa
+      RGAA_IN_CONTAINER: "1"
+      # Ollama embarqué : à 1 il démarre avec le conteneur, à 0 on le lance
+      # depuis les paramètres de l'interface.
+      RGAA_EMBEDDED_OLLAMA: "0"
+      RGAA_OLLAMA_URL: http://127.0.0.1:11434
+      OLLAMA_MODELS: /var/lib/rgaa/ollama
+    volumes:
+      # Seul répertoire inscriptible : runs, pages corrigées, journaux, modèles.
+      - rgaa-data:/var/lib/rgaa
+    restart: unless-stopped
+
+  # Variante sans Ollama embarqué : service séparé, activé à la demande.
+  #   docker compose --profile ollama up
+  #   docker compose exec ollama ollama pull qwen2.5:3b
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rgaa-ollama
+    profiles: ["ollama"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  rgaa-data:
+  ollama-data:

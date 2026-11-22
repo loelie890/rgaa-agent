@@ -1,0 +1,8 @@
+{
+  "steps": [
+    { "thought": "Je commence par inventorier les pages du site.", "tool": "site_list", "args": {} },
+    { "thought": "J'exécute les 12 règles sur tout le site pour avoir une vue complète.", "tool": "audit_run", "args": {} },
+    { "thought": "Je calcule le score de conformité avant d'expliquer quoi que ce soit.", "tool": "audit_score", "args": {} },
+    { "thought": "Les violations bloquantes sont les plus graves : je les classe par page et je donne le critère RGAA.", "final": "Score : 34 contrôles conformes sur 48 (70,8 %), 16 violations, dont 6 bloquantes, 7 majeures et 3 mineures, sur 4 pages. Les plus graves : sur `index.html`, l'élément `<html>` n'a pas de `lang` (RGAA 8.3) et le `<title>` est vide (8.6), l'image `#hero-shot` n'a pas d'attribut `alt` (1.1) et le logo est en `alt=\"\"` sans `role=\"presentation\"`. Sur `produits.html`, le champ `#email` n'a aucune étiquette (11.1) et la photo produit a un `alt` vide (1.1). Les majeures : contraste 2,64:1 sur `p.legal` (3.2), saut de niveau h1 vers h3 (9.1), iframe sans titre (2.1), lien icône sans intitulé (6.1), bouton sans intitulé (11.9), tableau sans `<th>` (5.6), et sur `tarifs.html` un contraste de 2,34:1 qui vient d'une règle CSS interne, pas d'un style en ligne. Mineures : id `contenu` dupliqué (8.2) et deux `<div>` dans une liste (9.3). Je n'ai rien corrigé : c'est un audit." }
+  ]
+}

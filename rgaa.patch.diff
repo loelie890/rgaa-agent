@@ -1,0 +1,81 @@
+--- a/index.html
++++ b/index.html
+@@ -1,14 +1,14 @@
+ <!doctype html>
+-<html>
++<html lang="fr">
+ <head>
+   <meta charset="utf-8">
+-  <title></title>
++  <title>Tilleul &amp; Cie — location de vélos</title>
+   <link rel="stylesheet" href="style.css">
+ </head>
+ <body>
+   <a class="skip" href="#contenu">Aller au contenu</a>
+   <header>
+-    <a class="icon-link" href="index.html"><img id="logo" src="logo.png" alt=""></a>
++    <a class="icon-link" href="index.html" aria-label="Lien vers Index"><img id="logo" src="logo.png" alt="" role="presentation"></a>
+     <nav>
+       <ul>
+         <li><a href="index.html">Accueil</a></li>
+@@ -19,16 +19,16 @@
+   </header>
+   <main id="contenu">
+     <h1>Tilleul &amp; Cie — location de vélos</h1>
+-    <p class="legal" style="color:#9aa0a6">Location de vélos et de trottinettes à Toulouse depuis 2019.</p>
+-    <img id="hero-shot" src="hero.png">
+-    <h3 id="engagements">Nos engagements</h3>
++    <p class="legal" style="color:#72767b">Location de vélos et de trottinettes à Toulouse depuis 2019.</p>
++    <img id="hero-shot" src="hero.png" alt="Hero">
++    <h2 id="engagements">Nos engagements</h2>
+     <ul class="engagements">
+       <li>Livraison gratuite en centre-ville</li>
+       <li>Retour sous 30 jours</li>
+     </ul>
+-    <iframe src="https://player.example.invalid/embed/42" width="560" height="315"></iframe>
++    <iframe src="https://player.example.invalid/embed/42" width="560" height="315" title="Contenu embarqué depuis player.example.invalid"></iframe>
+   </main>
+-  <footer id="contenu">
++  <footer id="contenu-2">
+     <p>Tilleul &amp; Cie — 12 rue de la Colombe, 31000 Toulouse (adresse fictive).</p>
+   </footer>
+ </body>
+--- a/produits.html
++++ b/produits.html
+@@ -15,19 +15,19 @@
+   </header>
+   <main>
+     <h1>Nos produits</h1>
+-    <img id="product-photo" src="velo.png" alt="">
++    <img id="product-photo" src="velo.png" alt="Velo">
+     <form action="/recherche" method="get">
+-      <input id="email" type="email" placeholder="Votre adresse électronique">
+-      <button class="search" type="submit"><span aria-hidden="true">&#9906;</span></button>
++      <label for="email">Votre adresse électronique</label><input id="email" type="email" placeholder="Votre adresse électronique">
++      <button class="search" type="submit" aria-label="Action"><span aria-hidden="true">⚲</span></button>
+     </form>
+     <table class="catalog">
+-      <tr><td>Modèle</td><td>Tarif</td></tr>
++      <tr><th>Modèle</th><th>Tarif</th></tr>
+       <tr><td>Tilleul 5</td><td>19 € / jour</td></tr>
+       <tr><td>Tilleul 9</td><td>27 € / jour</td></tr>
+     </table>
+     <ul class="benefits">
+-      <div>Livraison gratuite</div>
+-      <div>Retour sous 30 jours</div>
++      <li>Livraison gratuite</li>
++      <li>Retour sous 30 jours</li>
+     </ul>
+   </main>
+ </body>
+--- a/tarifs.html
++++ b/tarifs.html
+@@ -18,7 +18,7 @@
+ <body>
+   <main>
+     <h1>Tarifs de location</h1>
+-    <p class="tarif-note">Les tarifs sont donnés par jour et par vélo, assurance incluse.</p>
++    <p class="tarif-note" style="color:#72777d">Les tarifs sont donnés par jour et par vélo, assurance incluse.</p>
+     <p><span class="tarif-badge">Offre de lancement</span></p>
+     <table class="prices">
+       <tr><th>Modèle</th><th>Jour</th><th>Semaine</th></tr>

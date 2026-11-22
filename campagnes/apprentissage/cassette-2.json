@@ -1,0 +1,10 @@
+{
+  "steps": [
+    { "thought": "Je relis d'abord les procédures apprises : un alt vide a déjà été refusé.", "tool": "skill_recall", "args": { "topic": "alternative textuelle alt image décorative" } },
+    { "thought": "La procédure dit de décider si l'image informe. Je l'inspecte : c'est la photo de la gamme, elle apporte une information.", "tool": "html_query", "args": { "page": "index.html", "selector": "img#gamme-photo" } },
+    { "thought": "Image informative : je décris ce qu'elle montre, sans écrire « image de » inutile.", "tool": "patch_html", "args": { "page": "index.html", "selector": "img#gamme-photo", "op": "set_attr", "name": "alt", "value": "Trois vélos alignés devant la boutique : un modèle de ville, un mixte et un cargo" } },
+    { "thought": "Je vérifie le score : la règle 1.1 doit passer.", "tool": "audit_score", "args": {} },
+    { "thought": "Je génère le rapport avec le score d'avant, capturé à la première correction.", "tool": "report_render", "args": { "name": "audit-rgaa.md" } },
+    { "thought": "Fait, avec la procédure relue en première étape au lieu de réessayer à l'aveugle.", "final": "Correction appliquée : `img#gamme-photo` reçoit « Trois vélos alignés devant la boutique : un modèle de ville, un mixte et un cargo ». L'audit passe à 12 règles conformes sur 12 et 0 violation. Rapport écrit dans deliverables/audit-rgaa.md. La procédure relue en première étape est celle écrite après l'échec de la passe précédente." }
+  ]
+}

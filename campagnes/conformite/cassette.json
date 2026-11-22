@@ -1,0 +1,29 @@
+{
+  "steps": [
+    { "thought": "Inventaire avant de toucher à quoi que ce soit.", "tool": "site_list", "args": {} },
+    { "thought": "Audit complet : j'ai besoin des sélecteurs exacts des éléments fautifs.", "tool": "audit_run", "args": {} },
+    { "thought": "index.html : la langue n'est pas déclarée, je l'ajoute sur <html>.", "tool": "patch_html", "args": { "page": "index.html", "selector": "html", "op": "set_attr", "name": "lang", "value": "fr" } },
+    { "thought": "Le titre de page est vide : je le renseigne.", "tool": "patch_html", "args": { "page": "index.html", "selector": "title", "op": "set_text", "value": "Tilleul & Cie, location de vélos et trottinettes à Toulouse" } },
+    { "thought": "Le logo est décoratif (le lien porte déjà un nom) : je le déclare explicitement.", "tool": "patch_html", "args": { "page": "index.html", "selector": "img#logo", "op": "set_attr", "name": "role", "value": "presentation" } },
+    { "thought": "L'image d'accueil est informative : elle mérite une description utile, pas un alt vide.", "tool": "patch_html", "args": { "page": "index.html", "selector": "img#hero-shot", "op": "set_attr", "name": "alt", "value": "Trottinette électrique rouge pliée devant la boutique" } },
+    { "thought": "Le lien icône n'a aucun texte : je lui donne un intitulé explicite.", "tool": "patch_html", "args": { "page": "index.html", "selector": "a.icon-link", "op": "set_attr", "name": "aria-label", "value": "Accueil, Tilleul et Cie" } },
+    { "thought": "h1 puis h3 : je remets le niveau intermédiaire.", "tool": "patch_html", "args": { "page": "index.html", "selector": "h3#engagements", "op": "set_tag", "value": "h2" } },
+    { "thought": "Le contraste de p.legal est de 2,64:1 : je fonce la couleur jusqu'à dépasser 4,5:1.", "tool": "patch_html", "args": { "page": "index.html", "selector": "p.legal", "op": "set_attr", "name": "style", "value": "color:#333333" } },
+    { "thought": "L'iframe n'a pas de titre : je décris son contenu.", "tool": "patch_html", "args": { "page": "index.html", "selector": "iframe", "op": "set_attr", "name": "title", "value": "Vidéo de présentation de la boutique" } },
+    { "thought": "L'id contenu est utilisé deux fois : je renomme le pied de page.", "tool": "patch_html", "args": { "page": "index.html", "selector": "footer#contenu", "op": "set_attr", "name": "id", "value": "pied-de-page" } },
+    { "thought": "Je vérifie index.html avant de passer à la suite.", "tool": "audit_run", "args": { "page": "index.html" } },
+    { "thought": "produits.html : la photo produit est informative, son alt est vide.", "tool": "patch_html", "args": { "page": "produits.html", "selector": "img#product-photo", "op": "set_attr", "name": "alt", "value": "Vélo de ville bleu, modèle Tilleul 5, stationné devant la boutique" } },
+    { "thought": "Le champ e-mail n'a pas d'étiquette : j'ajoute un vrai <label for>, pas un placeholder.", "tool": "patch_html", "args": { "page": "produits.html", "selector": "input#email", "op": "insert_html", "name": "before", "value": "<label for=\"email\">Adresse électronique</label>" } },
+    { "thought": "Le bouton de recherche ne contient qu'une icône masquée : je lui donne un intitulé visible.", "tool": "patch_html", "args": { "page": "produits.html", "selector": "button.search", "op": "set_text", "value": "Rechercher" } },
+    { "thought": "La première ligne du tableau est un en-tête : je convertis ses cellules en <th>.", "tool": "patch_html", "args": { "page": "produits.html", "selector": "table.catalog tr:first-child td", "op": "set_tag", "value": "th" } },
+    { "thought": "La liste contient des <div> : je les convertis en <li>.", "tool": "patch_html", "args": { "page": "produits.html", "selector": "ul.benefits > div", "op": "set_tag", "value": "li" } },
+    { "thought": "Vérification sur produits.html.", "tool": "audit_run", "args": { "page": "produits.html" } },
+    { "thought": "tarifs.html : la note est à 2,34:1 à cause d'une règle CSS interne. Je demande une teinte conforme au lieu de deviner.", "tool": "contrast_propose", "args": { "color": "#a3aab3", "background": "#ffffff", "target": 4.5 } },
+    { "thought": "La proposition donne #72777d à 4,52:1 : je l'applique en style en ligne, qui gagne sur la feuille de style interne.", "tool": "patch_html", "args": { "page": "tarifs.html", "selector": "p.tarif-note", "op": "set_attr", "name": "style", "value": "color:#72777d" } },
+    { "thought": "Vérification sur tarifs.html.", "tool": "audit_run", "args": { "page": "tarifs.html" } },
+    { "thought": "Score global après corrections.", "tool": "audit_score", "args": {} },
+    { "thought": "Je génère le rapport HTML autonome : un juré le lit en dix secondes.", "tool": "report_html", "args": { "name": "rapport-rgaa.html" } },
+    { "thought": "Et le rapport markdown, pour la version texte.", "tool": "report_render", "args": { "name": "audit-rgaa.md" } },
+    { "thought": "Les 12 règles passent sur les 4 pages, les deux rapports sont écrits.", "final": "Site mis en conformité : 48 contrôles conformes sur 48 (100 %), 0 violation, 15 corrections réellement appliquées sur les fichiers HTML. Corrections structurantes : lang=\"fr\" sur <html>, titre de page renseigné, logo déclaré décoratif (role=\"presentation\") pendant que l'image d'accueil et la photo produit reçoivent une description utile, vrai <label for=\"email\"> inséré avant le champ, icône du bouton remplacée par l'intitulé Rechercher, <th> sur la ligne d'en-tête, <div> convertis en <li>, id dupliqué renommé, et la note de tarifs passée de 2,34:1 à 4,52:1 avec la teinte #72777d proposée par l'outil de contraste. Livrables : deliverables/rapport-rgaa.html (diff visuel avant/après), deliverables/audit-rgaa.md, rgaa-patches.json et les 4 pages corrigées dans le bac à sable du run." }
+  ]
+}

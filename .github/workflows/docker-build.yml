@@ -1,0 +1,85 @@
+name: Build and Publish RGAA Agent Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      ollama:
+        description: "Embarquer Ollama dans l'image (environ 1 Go, build plus long)"
+        type: boolean
+        default: false
+
+env:
+  REGISTRY: ghcr.io
+  GHCR_IMAGE: rgaa-agent
+  # Renseigner la variable de dépôt DOCKERHUB_IMAGE (compte/depot) pour publier aussi sur Docker Hub.
+  DOCKERHUB_IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        if: vars.DOCKERHUB_IMAGE != ''
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Compute image names
+        id: images
+        run: |
+          GHCR="${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.GHCR_IMAGE }}"
+          if [ -n "${{ env.DOCKERHUB_IMAGE }}" ]; then
+            echo "list=${GHCR},docker.io/${{ env.DOCKERHUB_IMAGE }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "list=${GHCR}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.images.outputs.list }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=sha,format=short
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            INSTALL_BROWSER=1
+            INSTALL_OLLAMA=1
+            BUILD_SHA=${{ github.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
