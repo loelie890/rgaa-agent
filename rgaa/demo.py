@@ -71,6 +71,13 @@ DEMO_PAGE = """<!doctype html>
   .run button { font: inherit; font-size: 13px; padding: 8px 16px; border-radius: 9px; border: 1px solid #b03060; background: #b03060; color: #fff; font-weight: 600; cursor: pointer; }
   .run button:disabled { opacity: .6; cursor: progress; }
   .out { font-size: 13px; color: #6d5f6b; }
+  .pages { display: flex; gap: 8px; justify-content: center; margin: 18px 0 6px; flex-wrap: wrap; }
+  .pages a { font-size: 13px; text-decoration: none; color: #6d5f6b; border: 1px solid #f0dfe7; background: #fff; border-radius: 999px; padding: 5px 14px; }
+  .pages a.on { background: #b03060; border-color: #b03060; color: #fff; font-weight: 600; }
+  .changes { background: #fff; border: 1px solid #f0dfe7; border-radius: 14px; padding: 16px 20px; margin-top: 14px; font-size: 13px; color: #4a3e47; }
+  .changes h2 { margin: 0 0 8px; font-size: 14px; }
+  .changes li { margin-bottom: 4px; }
+  .changes code { color: #b03060; }
   footer { padding: 0 26px 28px; color: #6d5f6b; font-size: 12.5px; }
   footer a { color: #b03060; }
 </style>
@@ -85,14 +92,15 @@ DEMO_PAGE = """<!doctype html>
     <span class="chip">__PATCHES__ corrections</span>
   </div>
 </header>
+<nav class="pages">__TABS__</nav>
 <main>
   <section>
-    <h2>Avant <a href="__PREFIX__/site/avant/index.html">ouvrir en plein écran</a></h2>
-    <iframe src="__PREFIX__/site/avant/index.html" title="Site de démonstration avant corrections, avec silhouette d'accessibilité"></iframe>
+    <h2>Avant <a href="__PREFIX__/site/avant/__PAGE__">ouvrir en plein écran</a></h2>
+    <iframe src="__PREFIX__/site/avant/__PAGE__" title="Site de démonstration avant corrections, avec silhouette d'accessibilité"></iframe>
   </section>
   <section>
-    <h2>Après <a href="__PREFIX__/site/apres/index.html">ouvrir en plein écran</a></h2>
-    <iframe src="__PREFIX__/site/apres/index.html" title="Site de démonstration après corrections de l'agent"></iframe>
+    <h2>Après <a href="__PREFIX__/site/apres/__PAGE__">ouvrir en plein écran</a></h2>
+    <iframe src="__PREFIX__/site/apres/__PAGE__" title="Site de démonstration après corrections de l'agent"></iframe>
   </section>
 </main>
 <section class="run">
@@ -116,6 +124,10 @@ DEMO_PAGE = """<!doctype html>
     <label for="runModel">Modèle vision</label>
     <input id="runModel" value="moondream" spellcheck="false">
   </div>
+  <section class="changes">
+    <h2>Ce qui change sur cette page</h2>
+    <ul class="clean" id="changesList"><li class="muted">chargement…</li></ul>
+  </section>
   <div class="row">
     <button id="runBtn" type="button">Lancer maintenant</button>
     <span id="runOut" class="out">aucune exécution pour l'instant</span>
@@ -127,6 +139,14 @@ DEMO_PAGE = """<!doctype html>
 </footer>
 <script>
 (() => {
+  const page = "__PAGE__";
+  fetch("__PREFIX__/api/patches").then((r) => r.json()).then((data) => {
+    const items = (data.patches || []).filter((p) => p.page === page);
+    const list = document.getElementById("changesList");
+    if (!items.length) { list.innerHTML = '<li class="muted">aucune correction sur cette page</li>'; return; }
+    list.innerHTML = items.map((p) => `<li>${p.review ? "à relire · " : ""}<code>${p.selector || ""}</code> ${p.op || ""}</li>`).join("");
+  }).catch(() => {});
+
   const mode = document.getElementById("runMode");
   const urlRow = document.getElementById("runUrlRow");
   const modelRow = document.getElementById("runModelRow");
@@ -157,7 +177,7 @@ DEMO_PAGE = """<!doctype html>
       document.querySelectorAll(".scores .chip b")[0].textContent = data.before.percent + " %";
       document.querySelectorAll(".scores .chip b")[1].textContent = data.after.percent + " %";
       document.querySelector(".scores .chip:last-child").textContent = data.patches + " corrections";
-      document.querySelectorAll("main iframe")[1].src = "__PREFIX__/site/apres/index.html?t=" + Date.now();
+      document.querySelectorAll("main iframe")[1].src = "__PREFIX__/site/apres/__PAGE__?t=" + Date.now();
     } catch (error) {
       out.textContent = "échec : " + error;
     } finally {
@@ -197,6 +217,15 @@ def prepare(workspace: Path | None = None) -> dict[str, Any]:
         "baseline": baseline,
         "score": current,
         "patches": len(result["patches"]),
+        "details": [
+            {
+                "page": item.get("page"),
+                "selector": item.get("selector"),
+                "op": item.get("op"),
+                "review": bool(item.get("review")),
+            }
+            for item in result["patches"]
+        ],
         "review": len(result["review"]),
         "passed": result["passed"],
     }
@@ -221,10 +250,31 @@ def run_now(vision: dict[str, Any] | None = None) -> dict[str, Any]:
         "before": result["baseline"],
         "after": result["score"],
         "patches": len(result["patches"]),
+        "details": [
+            {
+                "page": item.get("page"),
+                "selector": item.get("selector"),
+                "op": item.get("op"),
+                "review": bool(item.get("review")),
+            }
+            for item in result["patches"]
+        ],
         "review": len(result["review"]),
         "vision": result.get("vision", {}),
         "ms": round((time.perf_counter() - started) * 1000),
     }
+
+
+def annotations(patches: list[dict[str, Any]], page: str) -> str:
+    """Encadre dans la page corrigée les éléments que l'agent a modifiés."""
+    selectors = [p["selector"] for p in patches if p.get("page") == page and p.get("selector")]
+    if not selectors:
+        return ""
+    rules = "\n".join(
+        f"{sel}{{outline:2px dashed #b03060 !important;outline-offset:3px}}"
+        for sel in selectors[:40]
+    )
+    return f'<style id="rgaa-annotations">{rules}</style>'
 
 
 def _pages(root: Path) -> dict[str, Path]:
@@ -297,14 +347,24 @@ class Handler(BaseHTTPRequestHandler):
         info: dict[str, Any] = self.server.info  # type: ignore[attr-defined]
 
         if path in {"/", ""}:
+            pages = sorted(p.name for p in Path(info["before"]).glob("*.html"))
+            wanted = (urllib.parse.parse_qs(parsed.query).get("page") or ["tarifs.html"])[0]
+            current = wanted if wanted in pages else pages[0]
+            tabs = "".join(
+                f'<a href="?page={name}" class="{"on" if name == current else ""}">{name.replace(".html", "")}</a>'
+                for name in pages
+            )
             markup = (
-                DEMO_PAGE.replace("__PREFIX__", "").replace("__BEFORE__", str(info["baseline"]["percent"]))
+                DEMO_PAGE.replace("__PREFIX__", "").replace("__TABS__", tabs).replace("__PAGE__", current).replace("__BEFORE__", str(info["baseline"]["percent"]))
                 .replace("__AFTER__", str(info["score"]["percent"]))
                 .replace("__PATCHES__", str(info["patches"]))
             )
             self._send(200, markup.encode("utf-8"), "text/html; charset=utf-8")
         elif path == "/healthz":
             self._send(200, b'{"ok": true}', "application/json; charset=utf-8")
+        elif path == "/api/patches":
+            payload = {"patches": info.get("details", [])}
+            self._send(200, json.dumps(payload, ensure_ascii=False).encode("utf-8"), "application/json; charset=utf-8")
         elif path == "/api/score":
             payload = {
                 "avant": info["baseline"],
@@ -317,7 +377,16 @@ class Handler(BaseHTTPRequestHandler):
         elif path.startswith("/site/avant/"):
             self._static(Path(info["before"]), path[len("/site/avant/") :])
         elif path.startswith("/site/apres/"):
-            self._static(Path(info["after"]), path[len("/site/apres/") :])
+            relative = path[len("/site/apres/") :]
+            target = Path(info["after"]) / relative
+            if target.is_file() and target.suffix == ".html":
+                markup = target.read_text(encoding="utf-8")
+                tag = annotations(info.get("details", []), target.name)
+                if tag:
+                    markup = markup.replace("</head>", tag + "</head>", 1) if "</head>" in markup else tag + markup
+                self._send(200, markup.encode("utf-8"), "text/html; charset=utf-8")
+            else:
+                self._static(Path(info["after"]), relative)
         elif path in {"/rapport.html", "/rapport"}:
             self._static(Path(info["report"]).parent, Path(info["report"]).name)
         else:

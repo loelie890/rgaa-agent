@@ -221,17 +221,27 @@ class Handler(BaseHTTPRequestHandler):
     # -- routes ----------------------------------------------------------- #
     def _demo(self, path: str) -> None:
         """Le mode démo, monté sur le port de l'application : un seul port à ouvrir."""
-        from .demo import DEMO_PAGE, _guess_type
+        from .demo import DEMO_PAGE, _guess_type, annotations
 
         info = _demo_cached()
         relative = path[len("/demo") :].lstrip("/")
         if relative in {"", "index.html"}:
+            pages = sorted(p.name for p in Path(info["before"]).glob("*.html"))
+            wanted = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("page") or ["tarifs.html"])[0]
+            current = wanted if wanted in pages else pages[0]
+            tabs = "".join(
+                f'<a href="/demo?page={name}" class="{"on" if name == current else ""}">{name.replace(".html", "")}</a>'
+                for name in pages
+            )
             markup = (
-                DEMO_PAGE.replace("__PREFIX__", "/demo").replace("__BEFORE__", str(info["baseline"]["percent"]))
+                DEMO_PAGE.replace("__TABS__", tabs).replace("__PAGE__", current).replace("__PREFIX__", "/demo").replace("__BEFORE__", str(info["baseline"]["percent"]))
                 .replace("__AFTER__", str(info["score"]["percent"]))
                 .replace("__PATCHES__", str(info["patches"]))
             )
             self._send(200, markup.encode("utf-8"), "text/html; charset=utf-8")
+            return
+        if relative == "api/patches":
+            self._send_json({"patches": info.get("details", [])})
             return
         if relative == "api/score":
             payload = {
@@ -246,7 +256,13 @@ class Handler(BaseHTTPRequestHandler):
         for prefix, root in (("site/avant/", info["before"]), ("site/apres/", info["after"])):
             if relative.startswith(prefix):
                 target = Path(root) / relative[len(prefix) :]
-                if target.is_file():
+                if target.is_file() and target.suffix == ".html" and prefix == "site/apres/":
+                    markup = target.read_text(encoding="utf-8")
+                    tag = annotations(info.get("details", []), target.name)
+                    if tag:
+                        markup = markup.replace("</head>", tag + "</head>", 1) if "</head>" in markup else tag + markup
+                    self._send(200, markup.encode("utf-8"), "text/html; charset=utf-8")
+                elif target.is_file():
                     self._send(200, target.read_bytes(), _guess_type(target.name))
                 else:
                     self._send(404, b"introuvable", "text/plain; charset=utf-8")
