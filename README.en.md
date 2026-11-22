@@ -126,7 +126,7 @@ It will not make a site compliant with the 106 criteria, and no tool will withou
 
 What it does, it proves: every fix is followed by an audit, every score comes from disk, and every number on this page comes from a command run on this repository.
 
-## Check it without trusting me
+## How to check
 
 ```bash
 python -m unittest discover -s tests   # 95 tests, 8 s

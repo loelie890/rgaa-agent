@@ -160,7 +160,7 @@ Il ne rendra pas un site conforme aux 106 critères, et aucun outil ne le fera s
 
 Ce qu'il fait, il le prouve : chaque correction est suivie d'un audit, chaque score vient du disque, et chaque chiffre de cette page sort d'une commande exécutée sur ce dépôt.
 
-## Vérifier sans me croire
+## Comment vérifier
 
 ```bash
 python -m unittest discover -s tests   # 95 tests, 8 s
