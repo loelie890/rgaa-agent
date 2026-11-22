@@ -222,7 +222,11 @@ INDEX_HTML = r"""<!doctype html>
         </div>
         <div class="field">
           <label for="visionModel">Modèle vision</label>
-          <input id="visionModel" spellcheck="false" placeholder="qwen2.5vl:3b">
+          <select id="visionModel"><option value="">sonder le serveur vision</option></select>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="probeVisionBtn">Sonder l'adresse vision</button>
+          <span id="probeVisionOut" class="muted"></span>
         </div>
       </div>
 
@@ -628,7 +632,24 @@ async function probeModels() {
 $("#teamBtn").addEventListener("click", runTeam);
 $("#scanBtn").addEventListener("click", scanSite);
 $("#ciBtn").addEventListener("click", runCi);
+async function probeVision() {
+  const url = $("#visionUrl").value.trim() || $("#backendUrl").value.trim();
+  if (!url) { $("#probeVisionOut").textContent = "adresse vide"; return; }
+  $("#probeVisionOut").textContent = "…";
+  const result = await api("/api/probe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ base_url: url }) });
+  if (result.error) { $("#probeVisionOut").textContent = result.error; return; }
+  const select = $("#visionModel");
+  const previous = select.value;
+  select.innerHTML = result.models.length
+    ? result.models.map((m) => `<option value="${esc(m)}">${esc(m)}</option>`).join("")
+    : '<option value="">aucun modèle exposé</option>';
+  if (previous && result.models.includes(previous)) select.value = previous;
+  $("#probeVisionOut").textContent = `${result.models.length} modèle(s)`;
+  saveSettings();
+}
+
 $("#probeBtn").addEventListener("click", probeModels);
+$("#probeVisionBtn").addEventListener("click", probeVision);
 
 (async () => {
   applySettings();
