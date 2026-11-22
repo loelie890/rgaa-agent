@@ -194,6 +194,7 @@ def render(
     mode: str | None = None,
     timeout: float = 90.0,
     budget_ms: int = 4000,
+    _fallback: bool = False,
 ) -> Rendered:
     """Ouvre une page, la laisse s'exécuter, renvoie le DOM rendu et les mesures."""
     binary = find_chrome()
@@ -246,8 +247,14 @@ def render(
         completed = subprocess.run(  # noqa: S603 - binaire local, arguments fixes
             prefix + args, capture_output=True, timeout=timeout, check=False
         )
-    except subprocess.TimeoutExpired as exc:
-        raise BrowserError(f"navigateur muet après {timeout:.0f} s") from exc
+    except subprocess.TimeoutExpired:
+        # Un headful qui ne démarre pas (pas d'écran, Xvfb incomplet) ne doit pas
+        # faire échouer l'audit : on refait la mesure en headless et on le dit.
+        if flavoured == "headful" and os.environ.get("RGAA_HEADFUL_FALLBACK", "1") != "0":
+            logger = __import__("logging").getLogger(__name__)
+            logger.warning("headful indisponible, repli sur le rendu headless")
+            return render(url=url, path=path, mode="headless", timeout=timeout, budget_ms=budget_ms, _fallback=True)
+        raise BrowserError(f"navigateur muet après {timeout:.0f} s")
     elapsed = round((time.perf_counter() - started) * 1000)
     html = completed.stdout.decode("utf-8", "replace")
     if not html.strip():
@@ -255,7 +262,8 @@ def render(
         raise BrowserError(f"dom vide (code {completed.returncode}) {detail}".strip())
 
     report = extract_report(html)
-    return Rendered(html=html, report=report, url=base, ms=elapsed, mode=flavoured)
+    mode_label = "headless (headful indisponible)" if _fallback else flavoured
+    return Rendered(html=html, report=report, url=base, ms=elapsed, mode=mode_label)
 
 
 def extract_report(html: str) -> dict[str, Any]:
