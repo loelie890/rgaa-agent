@@ -38,6 +38,15 @@ docker run --rm -p 8080:8080 -p 8090:8090 -v rgaa-data:/var/lib/rgaa ghcr.io/loe
 
 The interface is on `http://localhost:8080`, the demo on `/demo` and on `http://localhost:8090`. The image is about 330 MB, Chromium and Xvfb are already inside, so the rendered pass works without installing anything. A second image, `:ollama`, adds the engine for the offline demo and is about 2.2 GB.
 
+## The demo, in practice
+
+Three minutes are enough to judge, without reading the rest.
+
+1. `docker run --rm -p 8080:8080 ghcr.io/loelie890/rgaa-agent:latest`
+2. Open `http://localhost:8080/demo`: the page before on the left, the same page fixed on the right, with the touched elements outlined in pink.
+3. Switch tabs to move from one page to another. Under the frames, the exact list of fixes for that page, with their selectors.
+4. Click "Lancer maintenant": without a model the audit runs again in 38 milliseconds. With a remote endpoint, the model describes the images and the agent writes the alternatives, in about a minute.
+
 ## How it works
 
 ```mermaid
