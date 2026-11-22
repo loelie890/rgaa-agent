@@ -267,7 +267,12 @@ def run_now(vision: dict[str, Any] | None = None) -> dict[str, Any]:
 
 def annotations(patches: list[dict[str, Any]], page: str) -> str:
     """Encadre dans la page corrigée les éléments que l'agent a modifiés."""
-    selectors = [p["selector"] for p in patches if p.get("page") == page and p.get("selector")]
+    skip = {"html", "body", "head", "title", "meta", "link", "script", "style"}
+    selectors = [
+        p["selector"]
+        for p in patches
+        if p.get("page") == page and p.get("selector") and p["selector"].strip().lower() not in skip
+    ]
     if not selectors:
         return ""
     rules = "\n".join(
